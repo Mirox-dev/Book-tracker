@@ -5,7 +5,7 @@
 struct Book {
     char title[100];
     char author[50];
-    char year[10];
+    int year;
     float grade;
 };
 
@@ -13,12 +13,12 @@ struct Book books[MAX_BOOKS];
 int books_count = 0;
 
 void saveBookToFile(const char *filename, struct Book b) {
-    FILE *fout = fopen(filename, "a");
+        FILE *fout = fopen(filename, "a");
     if (!fout) {
         printf("Can't open file\n");
         return;
     }
-    fprintf(fout, "%s %s %s %.2f\n", b.title, b.author, b.year, b.grade);
+    fprintf(fout, "%s %s %d %.2f\n", b.title, b.author, b.year, b.grade);
     fclose(fout);
 }
 
@@ -28,10 +28,10 @@ void loadBooks(const char *filename) {
         printf("Can't open file\n");
         return;
     }
-    while (fscanf(fin, "%99s %49s %9s %f",
+    while (fscanf(fin, "%99s %49s %d %f",
                   books[books_count].title,
                   books[books_count].author,
-                  books[books_count].year,
+                  &books[books_count].year,
                   &books[books_count].grade) == 4)
     {
         books_count++;
@@ -53,13 +53,27 @@ void addBook() {
 
     printf("Enter book author: ");
     scanf("%49s", newBook.author);
-
-    printf("Enter the year you read the book: ");
-    scanf("%9s", newBook.year);
-
-    printf("Enter your book grade: ");
-    scanf("%f", &newBook.grade);
-
+    while (1) {
+        printf("Enter the year you read the book: ");
+        if (scanf("%d", &newBook.year) != 1) {
+            printf("Can't read book year\n");
+            continue;
+        }
+        if (newBook.year < 2025) {
+            break;
+        }
+        printf("Enter the year equal or less than 2026\n");
+    }
+    while (1) {
+        printf("Enter your book grade: ");
+        if (scanf("%f", &newBook.grade) != 1) {
+            printf("Can't read book grade\n");
+        }
+        if (newBook.grade > 0 & newBook.grade < 11) {
+            break;
+        }
+        printf("Enter the grade more than 0 or less than 11\n");
+    }
     books[books_count++] = newBook;
     saveBookToFile("books.txt", newBook);
 
@@ -77,7 +91,7 @@ void showBooks() {
     printf("---------------------------------------\n");
 
     for (int i = 0; i < books_count; i++) {
-        printf("%-12s %-15s %s\n",
+        printf("%-12s %-15s %d\n",
                books[i].title,
                books[i].author,
                books[i].year);
@@ -120,7 +134,7 @@ int main() {
     int choice;
     do {
         showMenu();
-        if (scanf("%d   ", &choice) != 1) {
+        if (scanf("%d", &choice) != 1) {
             printf("Invalid input\n");
             break;
         }

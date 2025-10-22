@@ -3,7 +3,6 @@
 //
 #include <iostream>
 #include <fstream>
-#include <cstring>
 #include <iomanip>
 
 using namespace std;
@@ -14,14 +13,13 @@ struct Book
 {
     char title[100];
     char author[50];
-    char year[10];
+    int year;
     float grade;
 };
 Book books[MAX_BOOKS];
 int books_count = 0;
 void saveBooksToFile(const char *filename, Book b) {
     ofstream fout(filename, ios::app);
-
     if (!fout) {
         cout << "Can't open file " << endl;
         return;
@@ -51,10 +49,28 @@ void addBook() {
     cin >> newBook.title;
     cout << "Enter book author: ";
     cin >> newBook.author;
-    cout << "Enter the year you read the book: ";
-    cin >> newBook.year;
-    cout << "Enter your book grade: ";
-    cin >> newBook.grade;
+    while (true) {
+        cout << "Enter the year you read the book: ";
+        cin >> newBook.year;
+        if (!cin) {
+            cout << "Can't read book year" << endl;
+        }
+        if (newBook.year < 2025) {
+            break;
+        }
+        cout << "Enter the year equal or less than 2026" << endl;
+    }
+    while (true) {
+        cout << "Enter your book grade: ";
+        cin >> newBook.grade;
+        if (!cin) {
+            cout << "Can't read book grade" << endl;
+        }
+        if (11 > newBook.grade > 0) {
+            break;
+        }
+        cout << "Enter the grade more than 0 or less than 11" << endl;
+    }
     books[books_count++] = newBook;
     saveBooksToFile("books.txt", newBook);
 
